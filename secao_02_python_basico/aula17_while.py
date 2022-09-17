@@ -1,5 +1,11 @@
 """
 Estrutura de repetição WHILE.
+Em algumas situações é comum que uma mesma instrução (ou conjunto delas) precise
+ser executada várias vezes seguidas. Nesses casos, normalmente utilizamos um loop
+(ou laço de repetição) que permite executar o mesmo bloco de código enquanto uma
+condição é atendida. Em Python, os loops são codificados com as estruturas de
+repetição FOR e WHILE. Nesta aula veremos o While.
+
 O comando 'while' faz com que um conjunto de instruções seja executado enquanto
 uma condição é atendida. Quando o resultado dessa condição passa a ser falso,
 a execução do laço é interrompida.

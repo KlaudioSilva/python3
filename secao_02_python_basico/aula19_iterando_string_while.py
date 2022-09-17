@@ -1,11 +1,18 @@
 """
 Criando iterações com strings e while
+Não costumamos usar muito o 'while' pra criar iterações, o comando mais usado é o 'for', mas
+isso não quer dizer que não pôssamos utilizar o 'while'.
+Para iterar sobre um elemento, esse elemento precisa ter índices. Ou seja tem um começo e um fim,
+podemos usar um loop(laço) para passar sobre ele. De maneira genérica isso é iterar, ou seja:
+Passar sobre cada elemento da string.
 """
+# Veja na frase exemplo, o índice começa no 0 (o) e termina no 33 (a):
 #        Índices
 #        0123456789.......................33
 frase = 'o rato roeu a roupa do rei de roma'
 tamanho_frase = len(frase)
 contador = 0
+print(tamanho_frase)
 # pegando uma letra usando indices
 print(frase[5])
 
@@ -35,7 +42,7 @@ cont = 0
 nov_string = ''
 
 while cont < tam_frase:
-    nov_string += frase2[cont]
+    nov_string += frase2[cont]  # isso não é soma, é concatenar
     cont += 1
     # aqui você vê a nova string sendo construída a cada laço do while
     print(nov_string)
