@@ -67,3 +67,18 @@ num = input('Digite um valor inteiro qualquer: ')
 res = fizzbuzz(num)
 print(f'{res}')
 print()
+
+"""
+Exercicio 4 mais limpo:
+def fizzbuzz(valor):
+    if (num % 3 == 0) and (num % 5 == 0):
+        return 'FizzBuzz'
+    if num % 3 == 0:
+        return 'Fizz'
+    if num % 5 == 0:
+        return 'Buzz'
+
+num = input('Digite um valor inteiro qualquer: ')
+res = fizzbuzz(num)
+print(f'{res})
+"""
