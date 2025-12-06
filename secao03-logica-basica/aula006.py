@@ -2,7 +2,7 @@
 #type convertion, typecasting, coertion
 #é o ato de converter um tipo em outro
 #tipos imutáveis e primitivos:
-#str, int, float, boll
+#str, int, float, bool
 #print('1' + 1)      #vai receber a mensagem: 'TypeError: can only concatenate str (not "int") to str'
 print('a' + 'b')
 print('------------------------------------------')

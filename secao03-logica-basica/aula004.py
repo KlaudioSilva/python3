@@ -1,7 +1,7 @@
 #Tipos int e float
 #int → número inteiro
 #o tipo int representa qualquer número
-#positivo ou negativo. int sem sina é considerado
+#positivo ou negativo. int sem sinal é considerado
 #positivo
 print(11)   #int
 print(-11)  #int
