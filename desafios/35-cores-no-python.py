@@ -44,11 +44,13 @@ nome2 = str(input('Digite um nome: '))
 cores = {
     'Limpa':'\033[m',
     'Azul':'\033[34m',
+    'Cyan': '\033[36m',
+    'Pink': '\033[95m',
     'Amarelo':'\033[33m',
     'PretoBranco':'\033[7;30m'
 }
 
 #funcionou bem com 'format'
-print('Olá! Muito prazer em te conhecer {}{}{}'.format(cores['Azul'], nome2, cores['Limpa']))
+print('Olá! Muito prazer em te conhecer {}{}{}'.format(cores['Cyan'], nome2, cores['Limpa']))
 #não funcionou com f'strings
 #print(f'Olá! Muito prazer em te conhecer {cores["Azul"], nome2, cores["Limpa"]}')
