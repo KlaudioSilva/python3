@@ -6,8 +6,6 @@ elas podem formar um triângulo e além disso, qual é o tipo de triângulo form
     * ESCALENO: todos os lados são diferentes
 '''
 
-import datetime
-
 print('\033[92m-\033[m' * 30)
 print(f'\033[91m{"FORMA TRIÂNGULO? QUE TIPO?":^30}\033[m')
 print('\033[92m-\033[m' * 30)
