@@ -1,43 +1,40 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox
+from datetime import datetime
 
-#criando a janela principal
-root = tk.Tk()
-root.title('Minhas Notas 1.0')
-root.geometry('640x480')
+#classe prncipal do projeto
+class bloco_notas:
+    def __init__(self, root):
+        self.root = root
 
-#criando a folha de notas
-area_texto = tk.Text(root, wrap='word')
-area_texto.pack(expand=1, fill='both')
+        self.file_path = None
+        self.root.title('Sem título - My Notes')
+        self.root.geometry('800x600')
+        self.area_texto()
+        self.cria_menu()
+    
+    #cria a area do texto
+    def area_texto(self):
+        self.area_texto = tk.Text(self.root, undo=True)
+        self.area_texto.pack(fill=tk.BOTH, expand=True)
+
+        barra_scroll = tk.Scrollbar(self.area_texto)
+        barra_scroll.pack(side=tk.RIGHT, fill=tk.Y)
+        barra_scroll.config(command=self.area_texto.yview)
+
+        self.area_texto.config(yscrollcommand=barra_scroll.set)
+
+    #criando a barra do menu
+    def cria_menu(self):
+        barra_menu = tk.Menu(self.root)
+
+        #menu Arquivo
+        menu_arquivo = tk.Menu(barra_menu, tearoff=0)
+
 
 #
-def abre_arquivo():
-    caminho = filedialog.askopenfilename(defaultextension='.txt', filetypes=[('Arquivos de texto', '*.txt'), ('Todos os arquivos', '*.*')])
-    if caminho:
-        with open(caminho, 'r', encoding='utf-8') as f:
-            conteudo = f.read()
-        area_texto.delete(1.0, tk.END)
-        area_texto.insert(tk.END, conteudo)
+if __name__ == '__main__':
+    root = tk.Tk()
+    app = bloco_notas(root)
 
-def salvar_arquivo():
-    caminho = filedialog.asksaveasfilename(defaultextension='.txt', filetypes=[('Arquivos de texto', '*.txt'), ('Todos os arquivos', '*.*')])
-    if caminho:
-        with open(caminho, 'w', encoding='utf-8') as f:
-            f.write(area_texto.get(1.0, tk.END))
-        messagebox.showinfo('Salvar', 'Arquivo salvo corretamente.')
-
-#
-menu_sup = tk.Menu(root)
-
-#menu Arquivo:
-arquivo_menu = tk.Menu(menu_sup, tearoff=0)
-arquivo_menu.add_command(label="Abrir", command=abre_arquivo)
-arquivo_menu.add_command(label="Salvar", command=salvar_arquivo)
-arquivo_menu.add_separator()
-arquivo_menu.add_command(label="Sair", command=root.quit)
-
-menu_sup.add_cascade(label='Arquivo', menu=arquivo_menu)
-
-root.config(menu=menu_sup)
-
-root.mainloop()
+    root.mainloop()
