@@ -1,3 +1,4 @@
+import os
 import tkinter as tk
 from tkinter import filedialog, messagebox
 from tkinter import font, colorchooser
@@ -8,14 +9,25 @@ root.title("My Notes")
 root.geometry('800x600')
 
 #folha de texto
-area_txt = tk.Text()
+area_txt = tk.Text(root, wrap='none', undo=True)
 area_txt.pack(expand=1, fill='both')
+
+#scroll horizontal
+scroll_x = tk.Scrollbar(root, orient='horizontal', command=area_txt.xview)
+scroll_x.pack(side='bottom', fill='x')
+area_txt.configure(xscrollcommand=scroll_x.set)
 
 
 #----------------------------------
 #funções de Salvar e Abrir
 #----------------------------------
-def opn_file():
+def nw_file(event=None):                  #cria um novo arquivo
+    area_txt.delete(1.0, tk.END)
+
+def nw_window(event=None):                #abre outra janela do aplicativo
+    os.system('python ' + __file__)
+
+def opn_file(event=None):
     caminho = filedialog.askopenfilename(defaultextension='.txt',
                                          filetypes=[('Arquivos de texto', '*.txt'), ('Todos os arquivos', '*.*')])
     
@@ -25,7 +37,7 @@ def opn_file():
         area_txt.delete(1.0, tk.END)
         area_txt.insert(tk.END, conteudo)
 
-def sav_file():
+def sav_file(event=None):
     caminho = filedialog.asksaveasfilename(defaultextension='.txt',
                                        filetypes=[('Arquivos de texto', '*.txt'), ('Todos os arquivos', '*.*')])
     
@@ -34,7 +46,22 @@ def sav_file():
             f.write(area_txt.get(1.0, tk.END))
         messagebox.showinfo('Salvar', 'Arquivo salvo corretamente')
 
+def sav_file_as(event=None):
+    caminho = filedialog.asksaveasfilename(defaultextension='.txt', 
+                                           filetypes=[('Arquivos de texto', '*.txt'), ('Todos os arquivos', '*.*')])
 
+def print_file(event=None):
+
+    try:
+        conteudo = area_txt.get(1.0, tk.END)
+        caminho_temp = 'temp_print.txt'
+        with open(caminho_temp, 'w', encoding='utf-8') as f:
+            f.write(conteudo)
+        os.startfile(caminho_temp, 'print')
+    except Exception as e:
+        messagebox.showerror('Erro', f'Não foi possível imprimir: {e}')
+
+    
 
 #-------------------------------------
 #menu superior
@@ -43,20 +70,27 @@ bar_menu = tk.Menu(root)
 
 #menu Arquivo ------------------------
 mn_file = tk.Menu(bar_menu, tearoff=0)
-mn_file.add_command(label='Novo')
-mn_file.add_command(label='Nova Janela')
-mn_file.add_command(label='Abrir...', command=opn_file)
-mn_file.add_command(label='Salvar', command=sav_file)
-mn_file.add_command(label='Salvar como...')
+mn_file.add_command(label='Novo', command=nw_file, accelerator='Ctrl+N')
+mn_file.add_command(label='Nova Janela', command=nw_window, accelerator='Ctrl+Shift+N')
+mn_file.add_command(label='Abrir...', command=opn_file, accelerator='Ctrl+O')
+mn_file.add_command(label='Salvar', command=sav_file, accelerator='Ctrl+S')
+mn_file.add_command(label='Salvar como...', command=sav_file_as, accelerator='Ctrl+Shift+S')
 mn_file.add_separator()
 mn_file.add_command(label='Configurar página...')
-mn_file.add_command(label='Imprimir...')
+mn_file.add_command(label='Imprimir...', command=print_file, accelerator='Ctrl+P')
 mn_file.add_separator()
 mn_file.add_command(label='Fechar', command=root.quit)
-
 bar_menu.add_cascade(label='Arquivo', menu=mn_file)
 
 root.config(menu=bar_menu)
+
+#atalhos do menu Arquivo
+root.bind('<Control-n>', nw_file)
+root.bind('<Control-Shift-n>', nw_window)
+root.bind('<Control-o>', opn_file)
+root.bind('<Control-s>', sav_file)
+root.bind('<Control-Shift-s>', sav_file_as)
+root.bind('<Control-p>', print_file)
 
 #menu Editar -------------------------
 mn_edit = tk.Menu(bar_menu, tearoff=0)
@@ -79,7 +113,9 @@ mn_edit.add_command(label='Hora/Data')
 bar_menu.add_cascade(label='Editar', menu=mn_edit)
 
 
-#formatando as fontes
+#---------------------------------------------
+#funções de Formatar Fontes e Quebra de linha
+#---------------------------------------------
 def change_font():
     #cx de dialogo para escolher as fontes
     dialog = tk.Toplevel(root)
@@ -130,10 +166,20 @@ def change_font():
 
     tk.Button(dialog, text='Aplicar', command=apply_changes).pack()
 
+#quebra de linha-----------------------
+var_word_wrap = tk.BooleanVar(value=False)          #var que controla a quebra automatica
+def toggle_word_wrap():
+    if var_word_wrap.get():
+        area_txt.config(wrap='word')
+        scroll_x.pack_forget()                      #esconde o scroll horizontal
+    else:
+        area_txt.config(wrap='none')
+        scroll_x.pack(side='bottom',fill='x')       #mostra o scroll horizontal
+
 
 #menu Formatar -----------------------
 mn_format = tk.Menu(bar_menu, tearoff=0)
-mn_format.add_command(label='Quebra automática de linha')
+mn_format.add_checkbutton(label='Quebra automática de linha', variable=var_word_wrap, command=toggle_word_wrap)
 mn_format.add_command(label='Fonte...', command=change_font)
 
 
