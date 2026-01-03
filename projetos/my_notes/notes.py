@@ -4,27 +4,42 @@ import tkinter as tk
 from tkinter import filedialog, messagebox
 from tkinter import font, colorchooser
 
+#limites do zoom
+MIN_FONT_SIZE = 8
+MAX_FONT_SIZE = 48
+DEFAULT_FONT_SIZE = 12
+name_file = ''
+
 #janela do programa
 root = tk.Tk()
-root.title("My Notes")
+root.title(f"Sem título - My Notes")
 root.geometry('800x600')
 
-#frame principal para o editor
-frame_editor = tk.Frame(root)
-frame_editor.pack(expand=1, fill='both')
+#configura um grid principal
+root.rowconfigure(0, weight=1)
+root.rowconfigure(1, weight=0)
+root.columnconfigure(0, weight=1)
+
+#icone do programa
+root.iconbitmap('img/myNotes-ico.ico')
 
 #folha de texto
-area_txt = tk.Text(frame_editor, wrap='none', undo=True)
-area_txt.pack(expand=1, fill='both')
+area_txt = tk.Text(root, wrap='none', undo=True)
+area_txt.grid(row=0, column=0, sticky='nsew')
 
 #fonte padrão
-default_font = font.Font(family="Arial", size=12)
+default_font = font.Font(family="Arial", size=DEFAULT_FONT_SIZE)
 area_txt.config(font=default_font)
+
+#scroll vertical
+scroll_y = tk.Scrollbar(root, orient='vertical', command=area_txt.yview)
+scroll_y.grid(row=0, column=1, sticky='ns')
 
 #scroll horizontal
 scroll_x = tk.Scrollbar(root, orient='horizontal', command=area_txt.xview)
-scroll_x.pack(side='bottom', fill='x')
-area_txt.configure(xscrollcommand=scroll_x.set)
+scroll_x.grid(row=1, column=0, sticky='ew')
+
+area_txt.configure(yscrollcommand=scroll_y.set, xscrollcommand=scroll_x.set)
 
 #variavel global
 last_pos = None
@@ -40,22 +55,27 @@ def nw_window(event=None):                #abre outra janela do aplicativo
     os.system('python ' + __file__)
 
 def opn_file(event=None):                 #abre um arquivo existente
-    caminho = filedialog.askopenfilename(defaultextension='.txt',
+    file = filedialog.askopenfilename(defaultextension='.txt',
                                          filetypes=[('Arquivos de texto', '*.txt'), ('Todos os arquivos', '*.*')])
     
-    if caminho:
-        with open(caminho, 'r', encoding='utf-8') as f:
-            conteudo = f.read()
+    if file:
+        with open(file, 'r', encoding='utf-8') as f:
+            content = f.read()
         area_txt.delete(1.0, tk.END)
-        area_txt.insert(tk.END, conteudo)
+        area_txt.insert(tk.END, content)
+        name_file = file.split('/')[-1]
+        root.title(f'{name_file} - My Notes')
 
 def sav_file(event=None):                 #salva o arquivo editado
-    caminho = filedialog.asksaveasfilename(defaultextension='.txt',
+    file = filedialog.asksaveasfilename(defaultextension='.txt',
                                        filetypes=[('Arquivos de texto', '*.txt'), ('Todos os arquivos', '*.*')])
     
-    if caminho:
-        with open(caminho, 'w', encoding='utf-8') as f:
-            f.write(area_txt.get(1.0, tk.END))
+    if file:
+        with open(file, 'w', encoding='utf-8') as f:
+            content = area_txt.get(1.0, 'end-1c')
+            f.write(content)
+        name_file = file.split('/')[-1]
+        root.title(f'{name_file} - My Notes')
         messagebox.showinfo('Salvar', 'Arquivo salvo corretamente')
 
 def sav_file_as(event=None):
@@ -261,10 +281,6 @@ def change_font():
 #------------------------------------------------------------------------------------------------------------
 #funções de Exibir
 #------------------------------------------------------------------------------------------------------------
-#limites do zoom
-MIN_FONT_SIZE = 8
-MAX_FONT_SIZE = 48
-DEFAULT_FONT_SIZE = 12
 
 def zoom_in(event=None):                    #zoom mais
     global zoom_percent
@@ -411,8 +427,8 @@ bar_menu.add_cascade(label='Ajuda', menu=mn_help)
 
 #barra de status
 status_var = tk.StringVar()
-status_bar = tk.Label(root, textvariable=status_var, anchor='w')
-status_bar.pack(side='bottom', fill='x')
+status_bar = tk.Label(root, textvariable=status_var, anchor='e', relief='sunken', bg="#f0f0f0", font=("Arial", 9))
+status_bar.grid(row=1, column=0, sticky='ew')
 
 #variavel para o zoom
 zoom_percent = 100
