@@ -4,14 +4,22 @@ import tkinter as tk
 from tkinter import filedialog, messagebox
 from tkinter import font, colorchooser
 
-#janela principal
+#janela do programa
 root = tk.Tk()
 root.title("My Notes")
 root.geometry('800x600')
 
+#frame principal para o editor
+frame_editor = tk.Frame(root)
+frame_editor.pack(expand=1, fill='both')
+
 #folha de texto
-area_txt = tk.Text(root, wrap='none', undo=True)
+area_txt = tk.Text(frame_editor, wrap='none', undo=True)
 area_txt.pack(expand=1, fill='both')
+
+#fonte padrão
+default_font = font.Font(family="Arial", size=12)
+area_txt.config(font=default_font)
 
 #scroll horizontal
 scroll_x = tk.Scrollbar(root, orient='horizontal', command=area_txt.xview)
@@ -187,7 +195,7 @@ def edt_find_replace():
         area_txt.delete('1.0', tk.END)
         area_txt.insert('1.0', content_new)
 
-    #botoes
+    #botoes - definindo posições e tamanho dentro da janela
     btn_frame = tk.Frame(window)
     btn_frame.grid(row=4, column=0, columnspan=2, pady=10)
     tk.Button(btn_frame, text='Localizar Próxima', width=20, command=lambda: localize('next')).pack(side='top', pady=3)
@@ -248,6 +256,48 @@ def change_font():
         dialog.destroy()                            #fecha a janela
 
     tk.Button(dialog, text='Aplicar', command=apply_changes).pack()
+
+
+#------------------------------------------------------------------------------------------------------------
+#funções de Exibir
+#------------------------------------------------------------------------------------------------------------
+#limites do zoom
+MIN_FONT_SIZE = 8
+MAX_FONT_SIZE = 48
+DEFAULT_FONT_SIZE = 12
+
+def zoom_in(event=None):                    #zoom mais
+    global zoom_percent
+    size_zoom = default_font.cget('size')
+    if size_zoom < MAX_FONT_SIZE:
+        
+        default_font.config(size=size_zoom + 2)
+        zoom_percent = int((default_font.cget('size') / DEFAULT_FONT_SIZE) * 100)
+        refresh_status()
+
+def zoom_out(event=None):                   #zoom menos
+    global zoom_percent
+    size_zoom = default_font.cget('size')
+    if size_zoom > MIN_FONT_SIZE:
+
+        default_font.config(size=size_zoom - 2)
+        zoom_percent = int((default_font.cget('size') / DEFAULT_FONT_SIZE) * 100)
+        refresh_status()
+
+def zoom_reset(event=None):                 #restaura o tamanho padrão (12)
+    global zoom_percent
+    default_font.config(size=DEFAULT_FONT_SIZE)
+    zoom_percent = 100
+    refresh_status()
+
+#------------------------------------------------------------------------------------------------------------
+#funções de Ajuda
+#------------------------------------------------------------------------------------------------------------
+def show_help(event=None):
+    messagebox.showinfo("Ajuda", 'Este é um editor de texto simples.\n\nUse os menus para abrir, salvar e formatar seu texto.')
+
+def about(event=None):
+    messagebox.showinfo('Sobre', 'Bloco de Notas\nVersão 1.0\nDesenvolvido em Python com Tkinter.')
 
 #quebra de linha
 var_word_wrap = tk.BooleanVar(value=False)          #var que controla a quebra automatica
@@ -332,33 +382,60 @@ bar_menu.add_cascade(label='Formatar', menu=mn_format)
 
 #---------- menu Exibir ----------
 mn_show = tk.Menu(bar_menu, tearoff=0)
-mn_show.add_command(label='Zoom')
+mn_show.add_command(label='Ampliar', command=zoom_in, accelerator='Ctrl++')
+mn_show.add_command(label='Reduzir', command=zoom_out, accelerator='Ctrl+-')
+mn_show.add_command(label='Restaurar Padrão', command=zoom_reset, accelerator='Ctrl+0')
+mn_show.add_separator()
 mn_show.add_command(label='Barra de status')
+
+#atalhos do menu Exibir
+root.bind('<Control-plus>', zoom_in)
+root.bind('<Control-minus>', zoom_out)
+root.bind('<Control-0>', zoom_reset)
 
 bar_menu.add_cascade(label='Exibir', menu=mn_show)
 
 
 #--------- menu Ajuda ----------
 mn_help = tk.Menu(bar_menu, tearoff=0)
-mn_help.add_command(label='Exibir Ajuda')
-mn_help.add_command(label='Enviar Comentários')
+mn_help.add_command(label='Exibir Ajuda', command=show_help, accelerator='F1')
+mn_help.add_command(label='Enviar Comentários',)
 mn_help.add_separator()
-mn_help.add_command(label='Sobre o My Notes 1.0')
+mn_help.add_command(label='Sobre o My Notes 1.0', command=about)
+
+#atalho do menu Ajuda
+root.bind('<F1>', show_help)
 
 bar_menu.add_cascade(label='Ajuda', menu=mn_help)
 
 
 #barra de status
-status_bar = tk.Label(root, text='Linha 1, Coluna 1', anchor='w')
+status_var = tk.StringVar()
+status_bar = tk.Label(root, textvariable=status_var, anchor='w')
 status_bar.pack(side='bottom', fill='x')
 
-def refresh_status(event=None):
-    linha, coluna = area_txt.index(tk.INSERT).split('.')
-    status_bar.config(text=f'Linha {linha}, Coluna {int(coluna)+1}')
+#variavel para o zoom
+zoom_percent = 100
 
+def refresh_status(event=None):
+    global zoom_percent
+    #pega a posição atual do cursor
+    lin_pos, col_pos = area_txt.index(tk.INSERT).split('.')
+    status_var.set(f"Linha {lin_pos}, Coluna {int(col_pos)+1}   Zoom: {zoom_percent}%    UTF-8    Windows (CRLF)")
+
+#atualiza ao mover o cursor ou uma tecla pressionada
 area_txt.bind('<KeyRelease>', refresh_status)
 area_txt.bind('<ButtonRelease>', refresh_status)
 
+refresh_status()
+
+#ocultar/mostrar a barra de status
+status_var_visible = tk.BooleanVar(value=True)      #barra visivel
+def toggle_status_bar():
+    if status_var_visible.get():                    
+        status_bar.pack(side='bottom', fill='x')    #se a barra está visivel, por no fundo da janela
+    else:
+        status_bar.pack_forget()                    #senão barra fica invisivel (obvio)
 
 #--------------------------------------------------------------------------------------------------------------
 #funções de Copiar, Colar e Desfazer
